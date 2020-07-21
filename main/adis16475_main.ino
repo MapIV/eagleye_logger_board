@@ -89,15 +89,33 @@ void setup_CAN(){
 
 
   Can0.setFIFOFilter(REJECT_ALL);    // Set REJECT_ALL
-#if 1 /* toyota */
+  /* toyota */
   Can0.setFIFOFilter(0, 0xAA, STD);  // Set filter0 to allow STANDARD CAN ID 0xAA to be collected by FIFO. 
-  Can0.setFIFOFilter(1, 0x3BC, STD); // Set filter1 to allow STANDARD CAN ID 0x3BC to be collected by FIFO. 
-  Can0.setFIFOFilter(2, 0xB4, STD);  // Set filter2 to allow STANDARD CAN ID 0xB4 to be collected by FIFO. 
-#else /* toyota (can_id blocked car) */
-  Can0.setFIFOFilter(0, 0x45A, STD);  // Set filter0 to allow STANDARD CAN ID 0xAA to be collected by FIFO. 
-  Can0.setFIFOFilter(1, 0x4E0, STD); // Set filter1 to allow STANDARD CAN ID 0x3BC to be collected by FIFO. 
-#endif
+  Can0.setFIFOFilter(1, 0xB4, STD);  // Set filter2 to allow STANDARD CAN ID 0xB4 to be collected by FIFO. 
+  
+  /* honda */
+  Can0.setFIFOFilter(2, 0x1D0, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO. 
+  
+  /* nissan */
+  Can0.setFIFOFilter(3, 0x285, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO. 
+  Can0.setFIFOFilter(4, 0x29A, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO. 
+  
+  /* mazda */
+  Can0.setFIFOFilter(5, 0x1C, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO. 
+  
+  /* subaru */
+  Can0.setFIFOFilter(6, 0xD4, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO. 
+  
+  /* bmw */
+  Can0.setFIFOFilter(7, 0xCE, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO. 
+  Can0.setFIFOFilter(8, 0x1A0, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.   
+  
+  /* mercedes */
+  Can0.setFIFOFilter(9, 0x203, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO. 
 
+  /* vw */
+  Can0.setFIFOFilter(10, 0x11E, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.   
+  
 }
 
 void canSniff(const CAN_message_t &msg) {
