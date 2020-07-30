@@ -27,7 +27,7 @@
 #include <SPI.h>
 #include "USBHost_t36.h"
 #include <FlexCAN_T4.h>
-#include <math.h> 
+#include <math.h>
 
 #define USBBAUD 230400
 #define IMU_BUFF_SIZE 33
@@ -87,35 +87,64 @@ void setup_CAN(){
   Can0.onReceive(canSniff);
   //Can0.mailboxStatus();/* This function outputs the Teensy 4.0 CAN information. */
 
-
   Can0.setFIFOFilter(REJECT_ALL);    // Set REJECT_ALL
+
+  //CAN filter
+
   /* toyota */
-  Can0.setFIFOFilter(0, 0xAA, STD);  // Set filter0 to allow STANDARD CAN ID 0xAA to be collected by FIFO. 
-  Can0.setFIFOFilter(1, 0xB4, STD);  // Set filter2 to allow STANDARD CAN ID 0xB4 to be collected by FIFO. 
-  
+  //speed
+  Can0.setFIFOFilter(0, 0xAA, STD);  // Set filter0 to allow STANDARD CAN ID 0xAA to be collected by FIFO.
+  Can0.setFIFOFilter(1, 0xB4, STD);  // Set filter2 to allow STANDARD CAN ID 0xB4 to be collected by FIFO.
+  //shift
+  Can0.setFIFOFilter(2, 0x127, STD);  // Set filter2 to allow STANDARD CAN ID 0xB4 to be collected by FIFO.
+  Can0.setFIFOFilter(3, 0x3BC, STD);  // Set filter2 to allow STANDARD CAN ID 0xB4 to be collected by FIFO.
+
   /* honda */
-  Can0.setFIFOFilter(2, 0x1D0, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO. 
-  
+  //speed
+  Can0.setFIFOFilter(4, 0x1D0, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  //shift
+  Can0.setFIFOFilter(5, 0x1A3, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  Can0.setFIFOFilter(6, 0x191, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+
   /* nissan */
-  Can0.setFIFOFilter(3, 0x285, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO. 
-  Can0.setFIFOFilter(4, 0x29A, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO. 
-  
+  //speed
+  Can0.setFIFOFilter(7, 0x285, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  Can0.setFIFOFilter(8, 0x29A, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  //shift
+  Can0.setFIFOFilter(9, 0x41F, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  Can0.setFIFOFilter(10, 0x421, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+
   /* mazda */
-  Can0.setFIFOFilter(5, 0x1C, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO. 
-  
+  //speed
+  Can0.setFIFOFilter(11, 0x1C, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  //shift
+  Can0.setFIFOFilter(12, 0x228, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+
   /* subaru */
-  Can0.setFIFOFilter(6, 0xD4, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO. 
-  
+  //speed
+  Can0.setFIFOFilter(13, 0xD4, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  //shift
+  Can0.setFIFOFilter(14, 0x148, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+
   /* bmw */
-  Can0.setFIFOFilter(7, 0xCE, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO. 
-  Can0.setFIFOFilter(8, 0x1A0, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.   
-  
+  //speed
+  Can0.setFIFOFilter(15, 0xCE, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  Can0.setFIFOFilter(16, 0x1A0, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  //shift
+  Can0.setFIFOFilter(17, 0x198, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+
   /* mercedes */
-  Can0.setFIFOFilter(9, 0x203, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO. 
+  //speed
+  Can0.setFIFOFilter(18, 0x203, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  //shift
+  Can0.setFIFOFilter(19, 0x6D, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
 
   /* vw */
-  Can0.setFIFOFilter(10, 0x11E, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.   
-  
+  //speed
+  Can0.setFIFOFilter(20, 0x11E, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  //shift
+  Can0.setFIFOFilter(21, 0x187, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+
 }
 
 void canSniff(const CAN_message_t &msg) {
@@ -131,7 +160,7 @@ void canSniff(const CAN_message_t &msg) {
 
   can_buff[5] = (unsigned char)msg.len;
   uint16_t canid = (uint16_t)msg.id;
-  can_buff[6] = (uint8_t)((canid >> 16) & 0xFF);
+  can_buff[6] = (uint8_t)((canid >> 8) & 0xFF);
   can_buff[7] = (uint8_t)(canid & 0xFF);
   memcpy( &can_buff[8], &msg.buf[0], msg.len );
   isCANReceived = 1;
@@ -144,7 +173,7 @@ void sensorRead() {
   imu_data[3] = IMU.regRead(Y_GYRO_OUT);
   imu_data[4] = IMU.regRead(Z_GYRO_LOW);
   imu_data[5] = IMU.regRead(Z_GYRO_OUT);
-  
+
   imu_data[6] = IMU.regRead(X_ACCL_LOW);
   imu_data[7] = IMU.regRead(X_ACCL_OUT);
   imu_data[8] = IMU.regRead(Y_ACCL_LOW);
@@ -179,7 +208,7 @@ int isPPSHigh(){
 
 
 void setup()
-{ 
+{
   while (!Serial) ;
   Serial.begin(USBBAUD);
   IMU.configSPI();
@@ -201,7 +230,7 @@ void setup()
 
   memset(sendbuff, 0x00, 1024);
   memset(pps_buff, 0x00, 16);
-  
+
   userial.begin(230400);
 }
 
@@ -224,8 +253,8 @@ void loop()
   {
     sensorRead();
     isReceived = 1;
-    prev = curr;                    
-    
+    prev = curr;
+
     imu_buff[0] = 0x49; // 'I' hex = 0x49
     imu_buff[1] = (curr >> 24)&0xFF; // Timestap [1]-[4]
     imu_buff[2] = (curr >> 16)&0xFF;
@@ -268,7 +297,7 @@ void loop()
 
   if(isPPSHigh()){
     pps_cnt++;
-    
+
     unsigned long pps_time = millis();
     pps_buff[0] = 0x43; // 'C' hex = 0x43
     pps_buff[1] = (pps_time >> 24)&0xFF; // Timestap [1]-[4]
@@ -312,7 +341,7 @@ void loop()
       send_length += 1;
       sendbuff[send_length] = gnss_rx_len&0xFF;
       send_length += 1;
-      
+
       memcpy( &sendbuff[send_length], rx_buffer, gnss_rx_len );
       send_length += gnss_rx_len;
       gnss_rx_len = 0;
@@ -334,5 +363,5 @@ void loop()
     memset(sendbuff, 0x00, send_length);
 #endif
   }
-  
+
 }
