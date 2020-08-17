@@ -29,9 +29,12 @@
 #include <FlexCAN_T4.h>
 #include <math.h>
 
-#define USBBAUD 230400
+#define USBBAUD       230400
 #define IMU_BUFF_SIZE 33
 #define CAN_BUFF_SIZE 16
+
+#define NUM_RX_MAILBOXES 6  /* CAN MESSAGE BOX NUM (MB) */
+#define interval_value   20 /* IMU polling Interval value (ms) */
 
 #define DEBUG_FLAG 0
 
@@ -75,76 +78,55 @@ int printCounter = 0;
 int TXCapacity = 0;
 // ---- ---- ----
 
-#define interval_value (20) /* IMU polling Interval value (ms) */
-
 void setup_CAN(){
   Can0.begin();
   Can0.setBaudRate(500000);
   Can0.setClock(CLK_60MHz);
-  Can0.setMaxMB(16);
-  Can0.enableFIFO();
-  Can0.enableFIFOInterrupt();
-  Can0.onReceive(canSniff);
-  //Can0.mailboxStatus();/* This function outputs the Teensy 4.0 CAN information. */
 
-  Can0.setFIFOFilter(REJECT_ALL);    // Set REJECT_ALL
+  Can0.setMaxMB(NUM_RX_MAILBOXES);
+  for (int i = 0; i<NUM_RX_MAILBOXES; i++){
+    Can0.setMB((FLEXCAN_MAILBOX)i,RX);
+  }
+  
+  Can0.setMBFilter(REJECT_ALL);
+  Can0.enableMBInterrupts();
 
-  //CAN filter
+  /* set callBack MB */
+  Can0.onReceive(MB0, canSniff);
+  Can0.onReceive(MB1, canSniff);
+  Can0.onReceive(MB2, canSniff);
+  Can0.onReceive(MB3, canSniff);
+  Can0.onReceive(MB4, canSniff);
+  Can0.onReceive(MB5, canSniff);
 
-  /* toyota */
-  //speed
-  Can0.setFIFOFilter(0, 0xAA, STD);  // Set filter0 to allow STANDARD CAN ID 0xAA to be collected by FIFO.
-  Can0.setFIFOFilter(1, 0xB4, STD);  // Set filter2 to allow STANDARD CAN ID 0xB4 to be collected by FIFO.
-  //shift
-  Can0.setFIFOFilter(2, 0x127, STD);  // Set filter2 to allow STANDARD CAN ID 0xB4 to be collected by FIFO.
-  Can0.setFIFOFilter(3, 0x3BC, STD);  // Set filter2 to allow STANDARD CAN ID 0xB4 to be collected by FIFO.
+  /* set can filter hardware */
+  /* toyota (speed 0xAA 0xB4 , shift 0x127 0x3BC) */
+  Can0.setMBFilter(MB0, 0xAA, 0xB4, 0x127, 0x3BC);
 
-  /* honda */
-  //speed
-  Can0.setFIFOFilter(4, 0x1D0, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
-  //shift
-  Can0.setFIFOFilter(5, 0x1A3, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
-  Can0.setFIFOFilter(6, 0x191, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  /* honda  (speed 0x1D0 , shift 0x1A3 0x191) */
+  Can0.setMBFilter(MB1, 0x1D0, 0x1A3, 0x191);
 
-  /* nissan */
-  //speed
-  Can0.setFIFOFilter(7, 0x285, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
-  Can0.setFIFOFilter(8, 0x29A, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
-  //shift
-  Can0.setFIFOFilter(9, 0x41F, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
-  Can0.setFIFOFilter(10, 0x421, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  /* nissan (speed 0x285 0x29A , shift 0x41F 0x421) */
+  Can0.setMBFilter(MB2, 0x285, 0x29A, 0x41F, 0x421);
 
-  /* mazda */
-  //speed
-  Can0.setFIFOFilter(11, 0x1C, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
-  //shift
-  Can0.setFIFOFilter(12, 0x228, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  /* mazda  (speed 0x1C , shift 0x228) , subaru (speed 0xD4 , shift 0x148) */
+  Can0.setMBFilter(MB3, 0x1C, 0x228, 0xD4, 0x148);
 
-  /* subaru */
-  //speed
-  Can0.setFIFOFilter(13, 0xD4, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
-  //shift
-  Can0.setFIFOFilter(14, 0x148, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  /* bmw    (speed 0xCE 0x1A0 , shift 0x198) */
+  Can0.setMBFilter(MB4, 0x1D0, 0x1A0, 0x198);
 
-  /* bmw */
-  //speed
-  Can0.setFIFOFilter(15, 0xCE, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
-  Can0.setFIFOFilter(16, 0x1A0, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
-  //shift
-  Can0.setFIFOFilter(17, 0x198, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  /* mercedes   (speed 0x203 , shift 0x6D) , vw  (speed 0x11E , shift 0x187) */
+  Can0.setMBFilter(MB5, 0x203, 0x6D, 0x11E, 0x187);
 
-  /* mercedes */
-  //speed
-  Can0.setFIFOFilter(18, 0x203, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
-  //shift
-  Can0.setFIFOFilter(19, 0x6D, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
+  /* set can filter software */
+  Can0.enhanceFilter(MB0);
+  Can0.enhanceFilter(MB1);
+  Can0.enhanceFilter(MB2);
+  Can0.enhanceFilter(MB3);
+  Can0.enhanceFilter(MB4);
+  Can0.enhanceFilter(MB5);
 
-  /* vw */
-  //speed
-  Can0.setFIFOFilter(20, 0x11E, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
-  //shift
-  Can0.setFIFOFilter(21, 0x187, STD);  // Set filter0 to allow STANDARD CAN ID 0x1D0 to be collected by FIFO.
-
+  Can0.distribute();
 }
 
 void canSniff(const CAN_message_t &msg) {
